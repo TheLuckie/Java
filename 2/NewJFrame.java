@@ -216,39 +216,16 @@ public class NewJFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
        int selectedRow = tabl.getSelectedRow();
     
-        // Проверяем, выбрана ли строка
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Выберите строку для удаления!", 
                 "Ошибка", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-        try {
-        // Получаем индекс строки в модели
-        int modelIndex = tabl.convertRowIndexToModel(selectedRow);
-        
-        // Получаем модель таблицы
+
         DefaultTableModel model = (DefaultTableModel) tabl.getModel();
+
+        model.removeRow(selectedRow);
         
-        // Проверяем, что модель не null
-        if (model == null) {
-            JOptionPane.showMessageDialog(this, "Ошибка доступа к модели таблицы",
-                "Ошибка", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        // Удаляем строку из модели
-        model.removeRow(modelIndex);
-        
-        // Обновляем таблицу
-        tabl.revalidate();
-        tabl.repaint();
-        
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Произошла ошибка при удалении строки",
-            "Ошибка", JOptionPane.ERROR_MESSAGE);
-    }
-    
     }//GEN-LAST:event_deleteActionPerformed
 
     private void calculateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calculateActionPerformed
@@ -263,7 +240,7 @@ public class NewJFrame extends javax.swing.JFrame {
                 double upper = Double.parseDouble(model.getValueAt(selectedRow, 1).toString()); 
                 double step = Double.parseDouble(model.getValueAt(selectedRow, 2).toString());       
                 
-                double result = calculateIntegral(lower, upper, step);
+                double result = RecIntegral.calculateIntegral(lower, upper, step);
                 
                 if (selectedRow < records.size()) {
                     RecIntegral rec = records.get(selectedRow);
@@ -281,28 +258,7 @@ public class NewJFrame extends javax.swing.JFrame {
         } else {
             javax.swing.JOptionPane.showMessageDialog(this, "Выберите строку для вычисления!");
         }
-    }
 
-private double calculateIntegral(double a, double b, double h) {
-    java.util.function.DoubleUnaryOperator f = x -> 1/x;
-    
-    double sum = 0;
-    double currentX = a;
-    
-    while (currentX < b) {
-        double nextX = currentX + h;
-
-        if (nextX > b) {
-            h = b - currentX;
-            nextX = b;
-        }
-
-        sum += (f.applyAsDouble(currentX) + f.applyAsDouble(nextX)) * h / 2.0;
-        
-        currentX = nextX;
-    }
-    
-    return sum;
     }//GEN-LAST:event_calculateActionPerformed
 
     @SuppressWarnings("empty-statement")
@@ -360,8 +316,7 @@ private double calculateIntegral(double a, double b, double h) {
          DefaultTableModel model = (DefaultTableModel) tabl.getModel();
         
         model.setRowCount(0);
-        
-        // Заполняем данными из коллекции
+
         for (RecIntegral rec : records) {
             String result = rec.getResult() == 0 ? "" : String.format("%.6f", rec.getResult());
             model.addRow(new Object[]{
